@@ -18,6 +18,12 @@ cp /root/.bashrc ./
 cp /etc/vim/vimrc.local .vimrc
 echo 'source /opt/kubectl-aliases/.kubectl_aliases' >> .bashrc
 echo -e 'PS1="> "\nalias ll="ls -la"' >> .bashrc
+# 禁用可以查看密钥的一些简单指令
+echo 'alias vi="echo 'command forbiddon'"' >> .bashrc
+echo 'alias vim="echo 'command forbiddon'"' >> .bashrc
+echo 'alias cat="echo 'command forbiddon'"' >> .bashrc
+echo 'alias less="echo 'command forbiddon'"' >> .bashrc
+echo 'alias more="echo 'command forbiddon'"' >> .bashrc
 
 mkdir -p .kube
 
