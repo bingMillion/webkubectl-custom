@@ -324,7 +324,7 @@ func (server *Server) handleKubeConfigApi(w http.ResponseWriter, r *http.Request
 	token := randomstring.Generate(20)
 	ttyParameter := cache.TtyParameter{
 		Title: request.Name,
-		Arg:   strings.Replace(request.KubeConfig, " ", "", -1),
+		Arg:   strings.Replace(request.KubeConfig, " ", "", -1) + " " + token, //找到字符串中所有的空格，替换为空
 	}
 	if err := server.cache.Add(token, &ttyParameter, time.Duration(server.options.TokenExpiresDuration)*time.Second); err != nil {
 		log.Printf("save token and ttyParam err:%s", err.Error())
@@ -382,7 +382,7 @@ func (server *Server) handleKubeTokenApi(w http.ResponseWriter, r *http.Request)
 	token := randomstring.Generate(20)
 	ttyParameter := cache.TtyParameter{
 		Title: request.Name,
-		Arg:   strings.Replace(request.ApiServer, " ", "", -1) + " " + strings.Replace(request.Token, " ", "", -1),
+		Arg:   strings.Replace(request.ApiServer, " ", "", -1) + " " + strings.Replace(request.Token, " ", "", -1) + " " + token, // kubetoken api方式有两个参数，用空格分隔。 现在我新增一个参数
 	}
 	if err := server.cache.Add(token, &ttyParameter, time.Duration(server.options.TokenExpiresDuration)*time.Second); err != nil {
 		log.Printf("save token and ttyParam err:%s", err.Error())
