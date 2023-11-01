@@ -1,3 +1,18 @@
+# 项目说明
+* 新增自动记录历史命令功能，实现了按token导出，方便审计。
+* 新增禁用一些简单指令功能，防止用户查看token信息等。
+
+# 构建与部署
+1、在github页actions输入版本号进行自动构建,例如v1.0-1101beta1951
+2、本地部署运行
+```shell
+docker rm -f webkubectl && \
+docker run --name="webkubectl" -p 8080:8080 -d --privileged zbxx/webkubectl:v1.0-1101beta1951 && \
+docker exec -it webkubectl /bin/bash
+```
+3、访问localhost:8080即可
+
+
 [中文 README.md](https://github.com/KubeOperator/webkubectl/blob/master/README.zh_CN.md)
 
 # ![](https://raw.githubusercontent.com/KubeOperator/webkubectl/master/gotty/resources/favicon.png) Web Kubectl - Run kubectl command in web browser
