@@ -7,6 +7,8 @@ require (
 	github.com/creack/pty v1.1.15
 	github.com/elazarl/go-bindata-assetfs v1.0.1
 	github.com/fatih/structs v1.1.0
+	github.com/fsnotify/fsnotify v1.4.9
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis/v8 v8.11.3
 	github.com/gorilla/websocket v1.4.2
 	github.com/patrickmn/go-cache v2.1.0+incompatible

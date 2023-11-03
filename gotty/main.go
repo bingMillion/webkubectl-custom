@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/fsnotify/fsnotify"
+	"github.com/go-redis/redis"
 	"log"
 	"os"
 	"os/signal"
@@ -70,7 +72,11 @@ func main() {
 		if err != nil {
 			exit(err, 6)
 		}
-
+		redisdb = &Redis{redis.NewClient(&redis.Options{
+			Addr:     redisOptions.Addr,
+			Password: redisOptions.Password,
+			DB:       0,
+		})}
 		args := c.Args().Slice()
 		factory, err := localcommand.NewFactory(args[0], args[1:], backendOptions)
 		if err != nil {
@@ -106,6 +112,9 @@ func main() {
 		}
 		return nil
 	}
+	go func() {
+		WatchWebshellLog()
+	}()
 	app.Run(os.Args)
 }
 
@@ -146,4 +155,61 @@ func waitSignals(errs chan error, cancel context.CancelFunc, gracefulCancel cont
 			return <-errs
 		}
 	}
+}
+
+func WatchWebshellLog() {
+	// 创建文件/目录监听器
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		fmt.Printf("Error: %s\n", err)
+		return
+	}
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("Error: webshell log watch panic,%s\n", err)
+		}
+		fmt.Println("webshell log watch end")
+		watcher.Close()
+	}()
+	done := make(chan bool)
+	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				fmt.Println("webshell log watch panic")
+				close(done)
+			}
+		}()
+		for {
+			select {
+			case event, ok := <-watcher.Events:
+				if !ok {
+					return
+				}
+				// 打印监听事件
+				fmt.Printf("event: op: %s, name, %s\n", event.Op.String(), event.Name)
+				// 如果是创建事件或者写入事件
+				if event.Op&fsnotify.Create == fsnotify.Create || event.Op&fsnotify.Write == fsnotify.Write {
+					redisdb.LPush("webshellLog", event.Name)
+				}
+
+			case _, ok := <-watcher.Errors:
+				if !ok {
+					return
+				}
+			}
+		}
+	}()
+	// 监听当前目录
+	err = watcher.Add("/mnt/")
+	if err != nil {
+		fmt.Printf("Error: watcher.Add error,%s\n", err)
+	}
+	fmt.Println("webshell watcher start...")
+	<-done
+}
+
+var redisdb *Redis
+
+type Redis struct {
+	*redis.Client
 }
