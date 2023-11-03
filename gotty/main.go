@@ -77,6 +77,11 @@ func main() {
 			Password: redisOptions.Password,
 			DB:       0,
 		})}
+		_, err := redisdb.Ping().Result()
+		if err != nil {
+			exit(err, 6)
+		}
+
 		args := c.Args().Slice()
 		factory, err := localcommand.NewFactory(args[0], args[1:], backendOptions)
 		if err != nil {
@@ -189,7 +194,10 @@ func WatchWebshellLog() {
 				fmt.Printf("event: op: %s, name, %s\n", event.Op.String(), event.Name)
 				// 如果是创建事件或者写入事件
 				if event.Op&fsnotify.Create == fsnotify.Create || event.Op&fsnotify.Write == fsnotify.Write {
-					redisdb.LPush("webshellLog", event.Name)
+					err = redisdb.LPush("webshellLog", event.Name).Err()
+					if err != nil {
+						fmt.Printf("Error: %s\n", err)
+					}
 				}
 
 			case _, ok := <-watcher.Errors:
