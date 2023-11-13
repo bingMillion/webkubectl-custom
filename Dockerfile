@@ -36,6 +36,10 @@ COPY start-session.sh /opt/webkubectl
 COPY init-kubectl.sh /opt/webkubectl
 RUN chmod -R 700 /opt/webkubectl /usr/bin/gotty
 
+# support argo-rollouts
+RUN curl -LO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64
+RUN mv ./kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
+RUN chmod +x /usr/local/bin/kubectl-argo-rollouts
 
 ENV SESSION_STORAGE_SIZE=10M
 ENV WELCOME_BANNER="Welcome to Web Kubectl, try kubectl --help."
