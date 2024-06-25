@@ -32,6 +32,7 @@ if [ -z "${arg3}" ]; then    # 如果变量3为空，则arg的只有两个参数
     echo $arg1| base64 -d > .kube/config
     # 新增写入历史记录
     touch /mnt/${arg2}
+    chown nobody:nobody /mnt/${arg2}  # 修改文件所有权
     echo "HISTFILE=/mnt/${arg2}" >> ~/.bashrc
     echo "HISTFILESIZE=5000" >> ~/.bashrc    # 历史记录文件最大行数为5000
     echo "HISTSIZE=5000" >> ~/.bashrc        # 单个会话中history最大记录数为5000
@@ -39,6 +40,7 @@ if [ -z "${arg3}" ]; then    # 如果变量3为空，则arg的只有两个参数
 else
     # 新增写入历史记录
     touch /mnt/${arg3}
+    chown nobody:nobody /mnt/${arg3}  # 修改文件所有权
     echo "HISTFILE=/mnt/${arg3}" >> ~/.bashrc
     echo "HISTFILESIZE=5000" >> ~/.bashrc
     echo "HISTSIZE=5000" >> ~/.bashrc
